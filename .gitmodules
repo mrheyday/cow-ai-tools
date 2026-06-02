@@ -1,0 +1,18 @@
+[submodule "cow-programmatic-orders-api"]
+	path = cow-programmatic-orders-api
+	url = https://github.com/bleu/cow-programmatic-orders-api.git
+[submodule "cow-safe-messages-watch-tower"]
+	path = cow-safe-messages-watch-tower
+	url = https://github.com/bleu/cow-safe-messages-watch-tower.git
+[submodule "cow-shed"]
+	path = cow-shed
+	url = https://github.com/bleu/cow-shed.git
+[submodule "prediction-fx-markets"]
+	path = prediction-fx-markets
+	url = https://github.com/bleu/prediction-fx-markets.git
+[submodule "scripts/cow-3-create-cowswap-dataset/data/cow-docs/cowswap-repo"]
+	path = scripts/cow-3-create-cowswap-dataset/data/cow-docs/cowswap-repo
+	url = https://github.com/cowprotocol/cowswap.git
+[submodule "scripts/cow-4-create-cowsdk-dataset/data/cow-docs/cow-sdk-repo"]
+	path = scripts/cow-4-create-cowsdk-dataset/data/cow-docs/cow-sdk-repo
+	url = https://github.com/cowprotocol/cow-sdk.git

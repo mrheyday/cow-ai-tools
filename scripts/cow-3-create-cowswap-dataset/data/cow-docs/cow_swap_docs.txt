@@ -1,0 +1,1293 @@
+==> README.md <==
+[![Tests](https://github.com/cowprotocol/cowswap/workflows/CI/badge.svg)](https://github.com/cowprotocol/cowswap/actions/workflows/ci.yml?query=workflow%3ACI)
+
+CoW Swap is the first trading interface built on top of CoW Protocol.
+
+It allows you to buy and sell tokens using gasless orders that are settled
+peer-to-peer among its users or into any on-chain liquidity source while
+providing MEV protection.
+
+| **Platform**          | **Link**                                                                                                      |
+|-----------------------|---------------------------------------------------------------------------------------------------------------|
+| 🐮 **CoW Swap** 🐮    | [swap.cow.fi](https://swap.cow.fi/)                                                                           |
+| CoW Swap (IPFS)       | Every release is deployed automatically to IPFS ([Releases](https://github.com/cowprotocol/cowswap/releases)) |
+| CoW Swap (ENS)        | [ens://cowswap.eth](ens://cowswap.eth) or ([cowswap.eth.limo](https://cowswap.eth.limo))                      |
+| CoW Protocol          | [cow.fi](https://cow.fi)                                                                                      |
+| Docs                  | [docs.cow.fi](https://docs.cow.fi)                                                                            |
+| Governance (Snapshot) | [snapshot.org/#/cow.eth](https://snapshot.org/#/cow.eth)                                                      |
+| Stats                 | [dune.com/cowprotocol/cowswap](https://dune.com/cowprotocol/cow-swap-home)                                    |
+| X/Twitter             | [@CoWSwap](https://twitter.com/CoWSwap)                                                                       |
+| Discord               | [discord.com/invite/cowprotocol](https://discord.com/invite/cowprotocol)                                      |
+| Forum                 | [forum.cow.fi](https://forum.cow.fi)                                                                          |
+
+# 🐮 Run CoW Swap
+
+First install Dependencies:
+
+```bash
+pnpm install
+```
+
+To upgrade `@cowprotocol/cow-sdk` and all `@cowprotocol/sdk-*` packages to the latest published versions:
+
+```bash
+pnpm upgrade-sdk-latest
+pnpm install
+```
+
+Or, if you want to use `@cowprotocol/sdk` preview versions like `"@cowprotocol/cow-sdk": "7.0.4-pr-546-c04641f0.0"`, then:
+
+- run `pnpm upgrade-sdk-preview https://github.com/cowprotocol/cow-sdk/pull/787` with a link to SDK PR with deployed previews
+- run `PACKAGE_READ_AUTH_TOKEN=XXX pnpm run install:sdk-preview` instead of just `pnpm install`
+- the token must be generated in GitHub with `read:packages` permissions
+
+## Run
+
+Start CoW Swap on `http://localhost:3000`
+
+```bash
+pnpm start
+```
+
+Environment selection for `cowswap-frontend` is configured explicitly via `REACT_APP_ENVIRONMENT`
+in the app-level `.env.*` files:
+
+- Supported values:
+  `local`, `development`, `pr`, `staging`, `production`, `ens`
+
+- `apps/cowswap-frontend/.env.development` -> `local`
+- `apps/cowswap-frontend/.env.dev` -> `development`
+- `apps/cowswap-frontend/.env.staging` -> `staging`
+- `apps/cowswap-frontend/.env.production` -> `production`
+
+## Build
+
+Build the project. The static files will be generated in the `build` folder.
+
+```bash
+pnpm run build
+```
+
+### Sentry Sourcemaps
+
+`cowswap-frontend` generates production sourcemaps for Sentry.
+
+- Runtime error reporting still uses `REACT_APP_SENTRY_DSN`.
+- Build-time sourcemap upload uses `SENTRY_AUTH_TOKEN`.
+- `SENTRY_ORG` and `SENTRY_PROJECT` are optional overrides.
+  Defaults:
+  `cowprotocol` and `cowswap`
+
+If `SENTRY_AUTH_TOKEN` is not set, the build still succeeds, but sourcemaps are not uploaded to Sentry.
+
+## Unit testing
+
+```bash
+pnpm run test
+```
+
+# 🔎 Explorer
+
+Start the Explorer on <http://localhost:4200>
+
+[Read more about the Explorer](apps/explorer/README.md)
+
+### Start
+
+```bash
+pnpm run start:explorer
+```
+
+Explorer environment selection is configured explicitly via `REACT_APP_ENVIRONMENT`.
+See [apps/explorer/.env.example](apps/explorer/.env.example).
+
+### Build
+
+```bash
+pnpm run build:explorer
+```
+
+# 🐄 cow.fi
+
+Start cow.fi on <http://localhost:3001>
+
+### Start
+
+```bash
+pnpm run start:cowfi
+```
+
+`cow-fi` no longer infers its environment from the hostname. Set `NEXT_PUBLIC_ENVIRONMENT`
+explicitly. See [apps/cow-fi/.env.example](apps/cow-fi/.env.example).
+
+### Build
+
+```bash
+pnpm run build:cowfi
+```
+
+# 🖼️ Widget Configurator
+
+Start the Widget Configurator on <http://localhost:4200/widget-configurator>
+
+```bash
+# Start
+pnpm run start:widget
+
+# Build
+pnpm run build:widget
+```
+
+# 🌌 Cosmos UI Library
+
+Start the Cosmos UI Library on <http://localhost:5000>
+
+```bash
+pnpm run cosmos
+```
+
+# 🤓 Development
+
+## Integration test
+
+> ⚠️ To run the tests. Make sure you add the required environment variables to
+> your root `.env.local` file with:
+>
+> - `CYPRESS_INTEGRATION_TEST_PRIVATE_KEY=<your-private-key>`: Private key
+> - `CYPRESS_INTEGRATION_TESTS_INFURA_KEY=<your-infura-key>`: Infura key
+> - `CYPRESS_INTEGRATION_TESTS_ALCHEMY_KEY=<your-alchemy-key>`: Alchemy key (preferred if both are set)
+
+To launch it with our development server (so you have live-reloading):
+
+```bash
+# Terminal 1
+pnpm run start
+# Terminal 2
+pnpm run e2e
+```
+
+If we want to use the Cypress UI, with the production build:
+
+```bash
+# Terminal 1
+npx nx run cowswap-frontend:serve-static --port 3000
+# Terminal 2
+pnpm run e2e:open
+```
+
+## Analyze build
+
+Analyze CoW Swap bundle:
+
+```bash
+# Use one of the following templates: "sunburst" | "treemap" | "network" | "raw-data" | "list";
+ANALYZE_BUNDLE=true ANALYZE_BUNDLE_TEMPLATE=sunburst pnpm run build
+```
+
+# ⚙️ Configuration
+
+## RPC Endpoints
+
+You should set your own RPC endpoints.
+
+One simple way to do this, is by defining your own `REACT_APP_INFURA_KEY`
+environment var.
+
+Alternatively you can define the RPC URLs directly with the following
+environment variables:
+
+```ini
+REACT_APP_NETWORK_URL_1: https://...
+REACT_APP_NETWORK_URL_56: https://...
+REACT_APP_NETWORK_URL_100: https://rpc.gnosis.gateway.fm
+REACT_APP_NETWORK_URL_137: https://...
+REACT_APP_NETWORK_URL_8453: https://...
+REACT_APP_NETWORK_URL_9745: https://rpc.plasma.to
+REACT_APP_NETWORK_URL_42161: https://...
+REACT_APP_NETWORK_URL_43114: https://...
+REACT_APP_NETWORK_URL_57073: https://rpc-ten.inkonchain.com
+REACT_APP_NETWORK_URL_59144: https://rpc.linea.build
+REACT_APP_NETWORK_URL_11155111: https://...
+```
+
+Additionally, if you plan to run the integration tests locally you must define:
+
+```ini
+INTEGRATION_TESTS_INFURA_KEY: YOUR_INFURA_KEY
+INTEGRATION_TESTS_PRIVATE_KEY: YOUR_TEST_WALLET_PRIVATE_KEY
+```
+
+## Orderbook API Endpoints
+
+Fee quote requests and posting orders are sent to the Orderbook API. This API
+has the responsibility of collecting orders and handing them to the solvers.
+
+The reference implementation of the API is
+[CoW Protocol Services](https://github.com/cowprotocol/services).
+
+The API endpoint is configured using the environment variable
+`REACT_APP_ORDER_BOOK_URLS`:
+
+```ini
+REACT_APP_ORDER_BOOK_URLS='{"1":"https://YOUR_HOST","100":"https://YOUR_HOST","5":"https://YOUR_HOST"}
+```
+
+## Sentry Configuration
+
+For `apps/cowswap-frontend`:
+
+```ini
+REACT_APP_SENTRY_DSN=https://<public-dsn>
+SENTRY_AUTH_TOKEN=<sentry-auth-token>
+```
+
+Optional overrides for the build-time upload target:
+
+```ini
+SENTRY_ORG=cowprotocol
+SENTRY_PROJECT=cowswap
+```
+
+`SENTRY_AUTH_TOKEN` is the only required secret for source map upload. The org and project values are public identifiers and already default to the values above.
+
+## BFF API Endpoints (Backend for Frontend)
+
+The BFF API is a helper API that provides some additional data to the frontend.
+It is a API that is used to enhance the frontend experience enabling some
+features. It is not consider a required API for CoW Swap core functionality, the
+app will still allow the user to place order and will have some fallback logics
+in case this API is not available.
+
+The reference implementation of the API is
+[BFF (Backend For Frontend)](https://github.com/cowprotocol/bff).
+
+The API endpoint is configured using the environment variable
+`REACT_APP_BFF_BASE_URL`:
+
+```ini
+REACT_APP_BFF_BASE_URL=https://bff.cow.fi
+```
+
+## CMS API Endpoints (Content Management System)
+
+The CMS API is a helper API that provides some additional content to the frontend.
+
+It is not considered a required API for CoW Swap core functionality, the
+app will still allow the user to place orders and will have some fallback logic
+in case this API is not available.
+
+The reference implementation of the API is
+[CMS API](https://github.com/cowprotocol/cms).
+
+The API endpoint is configured using the environment variable
+`REACT_APP_CMS_BASE_URL`:
+
+```ini
+REACT_APP_CMS_BASE_URL=https://cms.cow.fi/api
+```
+
+## Price feeds
+
+CoW Swap tries to find the best price available on-chain using some price feeds.
+
+All price feeds are enabled by default, but they can be individually disabled by
+using an environment variable:
+
+| Name      | Environment variable                 | Type                         | Description                                                                          |
+|-----------|--------------------------------------|------------------------------|--------------------------------------------------------------------------------------|
+| **1inch** | `REACT_APP_PRICE_FEED_1INCH_ENABLED` | `boolean` (default = `true`) | [Paraswap](https://1inch.exchange) price estimation. Used for all price estimations. |
+| **0x**    | `REACT_APP_PRICE_FEED_0X_ENABLED`    | `boolean` (default = `true`) | [0x](https://0x.org/) price estimation. Used for all price estimation.               |
+
+## Metadata attached to orders (AppData)
+
+The app will attach some metadata to all orders.
+
+This metadata will be sent to the smart contract as a hexadecimal value in an
+order field called `AppData`. This value comes from hashing the content of a
+metadata JSON containing some information about the trade (using `keccak256` on
+the `UTF-8` bytes).
+
+The format of the JSON follows the format defined in
+[@cowprotocol/sdk-app-data](https://www.npmjs.com/package/@cowprotocol/sdk-app-data).
+
+To set your own `AppData`, change `REACT_APP_FULL_APP_DATA_<environment>`
+environment variable. For more details, check out the environment file (<.env>)
+
+# 🔎 SEO
+
+## Sitemap
+
+`pnpm run build:cowfi` also generates `./sitemap.xml` file.
+
+See [next-sitemap.config.js](apps/cow-fi/next-sitemap.config.js)
+
+# 🔫 Troubleshooting
+
+## Service worker
+
+In case of problems with the service worker cache you force a reset using
+[emergency.js](apps/cowswap-frontend/public/emergency.js) The plan:
+
+1. `const resetCacheInCaseOfEmergency = false` - change `false` to `true`
+2. Deploy a new version to production
+
+`emergency.js` is not cached by browser and loaded before all.
+
+## Vercel preview build
+
+Each app’s `vercel.json` uses `cd ../..` then **`npx pnpm@10.30.3`** so installs match root **`packageManager`** and avoid Vercel’s default **pnpm 9** (which can trigger `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` with this lockfile).
+
+**Project settings that must line up (if deploys fail for unclear reasons):**
+
+1. **Root Directory** for that Vercel project should be the app folder (e.g. `apps/cow-fi`). If it is the monorepo root instead, `cd ../..` is wrong and install reads the wrong tree.
+2. **Build & Development →** no **Install Command** / **Build Command** override in the dashboard that replaces `vercel.json` (or align them with the repo).
+3. **Node.js version** on Vercel should be current LTS (Corepack / `npx` expect a recent Node).
+4. **`ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`:** run `pnpm install` locally with **pnpm 10.30.3**, commit any `pnpm-lock.yaml` change, and ensure root `package.json` `pnpm.*` config was not edited without reinstalling.
+5. **Ignored Build Step:** use `node tools/scripts/ignore-build-step.js --app=…` — do not use a broken one-line `[ … || … ]` `sh` test (see below).
+
+Since this repo includes multiple apps, we do not want to build all of them on each PR because it causes long build queues in Vercel.
+Some apps (see the list below) are not required to be built on each PR so we run them only a PR is labeled with a specific label.
+This label is defined in the project settings on Vercel in `Settings`/`Git`/`Ignored Build Step` script.
+Use the Node script below (do **not** use a one-line `sh`/`bash` test with `[ ... || ... ]` inside a single `[` — POSIX `[` does not support `||` there, which breaks branch names like `feature/foo` and logs `[: missing \`]'`).
+
+For example, the label for the widget-configurator is `preview-widget-cfg`:
+
+```
+node tools/scripts/ignore-build-step.js --app=preview-widget-cfg
+```
+
+List of applications and their labels:
+
+- widget-configurator: `preview-widget-cfg`
+- cosmos: `preview-cosmos`
+- sdk-tools: `preview-sdk-tools`
+
+# 📚 Technical Documentation
+
+1. [Oveall Architecture](docs/architecture-overview.md)
+2. [Amounts formatting](libs/common-utils/src/amountFormat/README.md)
+3. [ABIs](libs/abis/README.md)
+==> docs/ARCHITECTURE.md <==
+---
+author: agents
+status: normative
+last_reviewed: 2026-03-05
+source_of_truth_scope: monorepo layout, dependency direction, and boundary enforcement
+visual_reference: docs/architecture-overview.md
+---
+
+# Architecture
+
+## Monorepo Map
+
+- `apps/`: deployable applications.
+- `libs/`: shared packages intended for reuse across apps.
+- `tools/`: repository tooling and automation scripts.
+- `testing/`: integration and test helpers.
+
+## Layering Direction
+
+Feature-Sliced direction is the default target for frontend apps where feasible.
+
+- Preferred layers (top to bottom): `app -> pages -> widgets -> features -> entities -> shared`.
+- Imports should point to the same or lower layer.
+- Avoid large refactors just to satisfy layering; apply incrementally on touched features.
+
+## cowswap-frontend Structure
+
+- `src/common`: shared primitives and cross-domain helpers.
+- `src/modules`: domain modules.
+- `src/pages`, `src/api`, `src/types`: app surface and integration points.
+
+Target boundary (legacy exceptions exist):
+- New code in `src/common/**` should avoid new imports from `src/modules/**`.
+- Existing imports are treated as debt and tracked in `docs/QUALITY.md`.
+- Current mechanical signals:
+  - `@typescript-eslint/no-restricted-imports` in `eslint.config.js` for `src/common/**`
+  - `import/no-internal-modules` warnings on deep module imports
+
+## Dependency Boundaries
+
+Use these defaults for new code:
+
+- If used by 2+ apps, move to `libs/`.
+- If app-specific, keep it in the app.
+- Imports across modules should go through module public APIs (`index.ts`) unless there is a justified local exception.
+- Avoid dependency cycles between modules.
+
+## Mechanical Enforcement
+
+Primary enforcement lives in [`eslint.config.js`](../eslint.config.js):
+
+- `@nx/enforce-module-boundaries`
+- `@typescript-eslint/no-restricted-imports`
+- `import/no-internal-modules` (advisory level)
+
+When introducing a new boundary rule, include:
+
+1. a machine check (lint rule/script/test),
+2. a remediation message that tells contributors what to do instead,
+3. a docs update in this file.
+==> docs/CLOUDFLARE_PAGES_MIGRATION.md <==
+# Cloudflare Pages Migration Notes
+
+Scope: `apps/cowswap-frontend` and `apps/explorer` only. `cow-fi` is intentionally excluded.
+
+## Repo-backed equivalents
+
+### `apps/cowswap-frontend`
+
+Vercel source of truth:
+- `apps/cowswap-frontend/vercel.ts`
+
+Cloudflare Pages equivalent:
+- `apps/cowswap-frontend/public/_headers`
+
+Captured in `_headers`:
+- `Content-Security-Policy`
+- `Cross-Origin-Opener-Policy`
+- `Cross-Origin-Resource-Policy`
+- `X-Content-Type-Options`
+- `Referrer-Policy`
+
+Notes:
+- The Vercel redirect that sends non-asset routes to `/` is not copied into `_redirects`.
+- Cloudflare Pages already provides SPA fallback for projects without a top-level `404.html`, which matches the current app output.
+
+### `apps/explorer`
+
+Vercel source of truth:
+- `apps/explorer/vercel.json`
+
+Cloudflare Pages equivalent:
+- No repo file is required for the current rewrite behavior.
+
+Notes:
+- The Vercel rewrite from `/(.*)` to `/index.html` is intentionally not translated to `_redirects`.
+- Cloudflare Pages SPA fallback covers this app as long as the build output does not introduce a top-level `404.html`.
+
+## Cloudflare Pages UI or API settings
+
+These settings do not have an equivalent static file in this repo for the current setup and must be configured per Pages project:
+- Git repository connection
+- Production branch
+- Preview branch controls
+- Root directory
+- Build command
+- Build output directory
+- Environment variables
+- Secrets
+- Custom domains
+- Branch-to-domain mappings, if used
+
+Recommended project settings:
+
+### `cowswap`
+- Root directory: repository root
+- Build command: `pnpm run install:ci && pnpm run build:cowswap`
+- Build output directory: `build/cowswap`
+- Build variable: `SKIP_DEPENDENCY_INSTALL=1`
+- Secret: `SENTRY_AUTH_TOKEN` for build-time sourcemap upload
+- Optional overrides:
+  - `SENTRY_ORG=cowprotocol`
+  - `SENTRY_PROJECT=frontend`
+  - These are already the repo defaults and only need to be set if you want to override them.
+
+### `explorer`
+- Root directory: repository root
+- Build command: `pnpm run install:ci && pnpm run build:explorer`
+- Build output directory: `build/explorer`
+- Build variable: `SKIP_DEPENDENCY_INSTALL=1`
+
+## No exact Cloudflare Pages file alternative
+
+### `cowswap` Vercel regex redirect
+
+Current Vercel behavior:
+- `source: /((?!#|.*[\\w\\d\\.-]\\.\\w{2,15}$).+)`
+- `destination: /`
+
+Why it is not translated:
+- Cloudflare Pages `_redirects` does not support the same regex semantics.
+- Using a broad `_redirects` rule here would be a behavior change because Pages redirect rules run before header matching and static asset resolution logic differs from the Vercel config.
+
+Fallback used instead:
+- Native Cloudflare Pages SPA serving.
+
+## Validation checklist
+
+- `apps/cowswap-frontend/public/_headers` is copied into `build/cowswap/_headers`.
+- `build/cowswap` and `build/explorer` do not contain a top-level `404.html`.
+- Deep links for both apps resolve correctly on Pages preview deployments.
+- `cowswap` document responses include the migrated security headers.
+==> docs/HARNESS_HARDENING.md <==
+---
+author: agents
+status: active roadmap
+last_reviewed: 2026-03-05
+source_of_truth_scope: next steps to move from partial checks to fully enforced contributor harnesses
+---
+
+# Harness Hardening Roadmap
+
+Purpose: track the next steps to move from "documented guidance + partial checks" to "fully enforced, measurable, and continuously maintained" contributor harnesses.
+
+## Current State
+
+Implemented:
+
+- Root AGENTS is compact and acts as a TOC.
+- `pnpm agents:check` validates AGENTS/doc harness integrity.
+- CI job `agent-harness` enforces these checks on PRs/pushes.
+
+Still pending:
+
+- More architecture constraints are prose or warning-only, not blocking.
+- No scenario-based eval harness with pass-rate trend tracking.
+- No scheduled drift-maintenance automation that opens maintenance PRs.
+
+## Track 1: Architecture As Code
+
+Goal: convert boundary guidance into blocking checks with safe rollout.
+
+### Pending Work
+
+- Add a baseline-backed guardrail for `common/** -> modules/**` imports.
+- Promote selected warning-level boundary rules to error-level where safe.
+- Encode critical module dependency direction rules as machine checks.
+
+### Implementation Shape
+
+1. Add `tools/scripts/common-modules-guardrail.mjs` with baseline support.
+2. Add `tools/baselines/common-to-modules-baseline.txt`.
+3. Add scripts:
+   - `common-modules:check`
+   - `common-modules:baseline:update`
+4. Wire `common-modules:check` into `agents:check`.
+5. Incrementally tighten lint rules in `eslint.config.js`:
+   - start with narrow, high-confidence denies
+   - keep remediation text actionable
+
+### Exit Criteria
+
+- New `common -> modules` violations fail CI.
+- Selected boundary rules promoted from warning to error with no broad breakage.
+- Legacy violations visible via baseline files and trendable counts.
+
+## Track 2: Eval Harness
+
+Goal: measure agent/code-change quality with repeatable tasks and score trends.
+
+### Pending Work
+
+- Create executable scenario suite for representative repo tasks.
+- Add pass/fail assertions and metrics output.
+- Run smoke evals on PR and full evals on schedule.
+
+### Implementation Shape
+
+1. Add `tools/harness/scenarios/` with 10-20 scoped tasks:
+   - boundary fix
+   - data fetching pattern slice
+   - typed bugfix
+   - small refactor with tests
+2. Add `tools/harness/run.mjs`:
+   - executes scenarios
+   - emits JSON report with pass rate and regressions
+3. Add CI integration:
+   - PR: smoke subset
+   - nightly: full suite
+4. Store historical reports as workflow artifacts or committed snapshots.
+
+### Exit Criteria
+
+- Harness pass-rate and regressions are visible over time.
+- Failing scenarios are actionable and link to exact checks.
+- Scenario set is maintained as architecture/rules evolve.
+
+## Track 3: Drift Automation
+
+Goal: pay down harness/codebase drift continuously with small automated maintenance loops.
+
+### Pending Work
+
+- Add scheduled workflow that runs harness and drift scans.
+- Auto-open maintenance PRs for safe updates.
+- Keep quality grades and plan status fresh.
+
+### Implementation Shape
+
+1. Add scheduled workflow (weekly):
+   - run `pnpm agents:check`
+   - run architecture drift scripts
+   - scan stale `.plans/active` entries
+2. Generate/update:
+   - `docs/QUALITY.md` freshness section
+   - baseline drift summaries
+3. Auto-open a maintenance PR with constrained file scope.
+4. Require normal CI + owner review for merge.
+
+### Exit Criteria
+
+- Weekly maintenance PR is generated reliably.
+- Quality ledger and baselines stay current with minimal manual effort.
+- Drift backlog no longer accumulates silently.
+
+## Sequencing
+
+Recommended order:
+
+1. Track 1 (highest risk-reduction and immediate enforcement value)
+2. Track 2 (adds measurable quality signal)
+3. Track 3 (sustains long-term health with lower manual overhead)
+
+## Reporting
+
+- Update this roadmap when milestone status changes.
+- Mirror key progress in `docs/QUALITY.md`.
+- For active execution, create/maintain a concrete plan under `.plans/active/`.
+==> docs/MODULE_CONVENTIONS.md <==
+---
+author: agents
+status: normative
+last_reviewed: 2026-03-05
+source_of_truth_scope: naming, file structure, exports/imports, and React module hygiene
+---
+
+# Module Conventions
+
+## Naming and File Shape
+
+- Prefer explicit suffixes:
+  - `*.container.tsx`, `*.pure.tsx`, `*.styled.ts`, `*.types.ts`, `*.constants.ts`, `*.utils.ts`, `*.service.ts`, `*.test.ts`
+- Hooks are the naming exception and should use `useX.ts` / `useX.tsx`.
+- Avoid generic filenames like `styled` unless the file is intentionally a barrel or module entry.
+
+## Exports
+
+- Prefer named exports over default exports.
+- Keep component file exports focused (component + component-specific types).
+- Re-export public module APIs from `index.ts`.
+
+## Imports
+
+- Within a module, use relative imports for module internals.
+- For shared app code, use aliases (`common/...`, `modules/...`) instead of long relative traversals.
+- Avoid deep internal imports across module boundaries unless explicitly justified.
+- Follow repository `import/order` lint rules.
+
+## React Authoring Rules
+
+- Do not define components inside render bodies.
+- Avoid helper factories that return JSX on hot render paths.
+- Keep stable list keys; do not generate random keys per render.
+- Prefer extraction/composition over pass-through wrapper components.
+
+## Localization
+
+- Keep Lingui `t\`\`` / `t()` calls inside components or functions.
+- Do not place translation calls at module scope.
+
+## Styling
+
+- Use `styled-components/macro` (not raw `styled-components`).
+- Keep style-only files in `*.styled.ts` when styles are non-trivial.
+- In cowswap-frontend modules, style imports should use:
+  ```ts
+  import * as styledEl from './X.styled'
+  ```
+
+## TypeScript Rules
+
+- `strictNullChecks` assumptions apply.
+- Never use `any` for production code; prefer specific types or `unknown`.
+- No non-null assertions (`!`).
+- Use enums/unions from upstream SDK/types instead of raw string literals.
+==> docs/QUALITY.md <==
+---
+author: agents
+status: normative
+last_reviewed: 2026-03-05
+source_of_truth_scope: lightweight quality/freshness signal for autonomous contributors
+---
+
+# Quality Ledger
+
+## Grade Scale
+
+- `A`: boundaries and tests are healthy; no meaningful structural debt.
+- `B`: mostly healthy with isolated debt.
+- `C`: repeated drift or missing coverage; remediation needed.
+- `D`: unstable architecture/testing posture; prioritize cleanup work.
+
+## Domain Grades
+
+| Domain/Layer | Grade | Notes |
+| --- | --- | --- |
+| cowswap-frontend `swap` | B | Healthy core flow; continue reducing deep cross-module imports. |
+| cowswap-frontend `limitOrders` | B | Stable behavior; data fetching pattern under evaluation. |
+| cowswap-frontend `common` | C | Guard against domain logic leakage from modules. |
+| cowswap-frontend `trade` | B | Orchestrator role is useful but import direction should be reviewed regularly. |
+| cow-fi app | B | Lint/type strictness still partially downgraded in eslint config. |
+| explorer app | B | Stable baseline; keep additive AGENTS/docs aligned with root harness. |
+
+## Known Cross-Cutting Gaps
+
+- Some architectural boundaries are still documented more strongly than they are lint-enforced.
+- Data fetching pattern (SWR vs `atomWithQuery`) migration is under evaluation.
+- Domain grading should be refreshed continuously with targeted evidence.
+- Hardening roadmap and milestones live in `docs/HARNESS_HARDENING.md`.
+
+## Update Rules
+
+- Update this file whenever a cleanup/refactor materially improves or regresses domain health.
+- Add one sentence of evidence in the notes column when changing a grade.
+- If no quality review happened in 30 days, open a maintenance issue and refresh grades.
+==> docs/STATE_MANAGEMENT.md <==
+---
+author: agents
+status: normative
+last_reviewed: 2026-03-05
+source_of_truth_scope: Jotai usage, query patterns, persistence, and migration conventions
+---
+
+# State Management
+
+## Defaults
+
+- Use Jotai for entity/shared state in frontend apps.
+- Use focused atoms/selectors to avoid broad rerender cascades.
+- Keep ownership local to the module that mutates the state.
+
+## Remote Data Fetching
+
+- Both SWR and Jotai `atomWithQuery` (from `jotai/query`) are acceptable for data fetching.
+- The team is evaluating a phased migration from SWR to `atomWithQuery`; no forced migration yet.
+- When using SWR:
+  - SWR keys must include every response-defining parameter.
+  - Memoize key parameter objects.
+  - Use no-refresh options when revalidation causes UX flicker.
+
+## Persistence
+
+- Do not use manual `localStorage` synchronization with `useState` + `useEffect`.
+- Use `atomWithStorage` for persisted entities.
+- Persistence keys must follow `camelCaseBase:v{number}`.
+
+Reference implementations:
+
+- `apps/cowswap-frontend/src/entities/bridgeOrders/state/bridgeOrdersAtom.ts`
+- `libs/tokens/src/state/tokens/favoriteTokensAtom.ts`
+- `apps/cowswap-frontend/src/modules/tokensList/state/recentTokensAtom.ts`
+
+## Migrations
+
+- Place migrations under `state/migrations/*` in the owning module.
+- Parse persisted data defensively; malformed state must not crash startup.
+- Add cleanup TODO dates for migration removal.
+
+## Performance Guardrails
+
+- Memoize object-returning hooks where reference identity matters.
+- Avoid overlapping async writes for polling/loop flows.
+- Split large provider payloads into focused slices/selectors.
+==> docs/architecture-overview.md <==
+---
+author: human
+status: reference
+last_reviewed: 2026-03-05
+source_of_truth_scope: visual architecture diagram and module map
+normative_rules: docs/ARCHITECTURE.md
+---
+
+# CoW Swap Architecture
+
+> This documentation is part of the broader https://github.com/cowprotocol/cowswap-diagrams
+
+Overall architecture of the project
+
+![Overall Architecture](./architecture-overview.drawio.svg)
+
+## Modules
+
+### Core modules
+
+- wallet
+- transactions
+- gas
+- prices
+
+### Trading modules
+
+- [trade](../apps/cowswap-frontend/src/modules/trade/docs/trade-module.md)
+- swap
+- limitOrder
+- twap
+
+### Helper trading modules
+
+- cancelOrder
+- wrapNative
+
+### Basic components (UI building blocks)
+
+- components
+- forms
+
+### UI modules
+
+- account
+- notifications
+- activity
+
+### appData
+
+- [appData](../apps/cowswap-frontend/src/modules/appData/appData-module.md)
+- ~affiliate~ (not used right now)
+- [utm](../apps/cowswap-frontend/src/modules/utm/utm-module.md)
+
+### Token modules
+
+- tokens
+- tokenLists
+- tokenImages
+- cowToken
+
+### Other
+
+- misc
+==> docs/superpowers/specs/2026-05-13-changesets-migration-design.md <==
+---
+title: Migrate monorepo release tooling from release-please to changesets
+date: 2026-05-13
+status: approved
+owner: alexandr@cow.fi
+---
+
+# Migrate monorepo release tooling from release-please to changesets
+
+## Why
+
+`release-please` walks commit history through GitHub's GraphQL `Commit.history()`,
+which returns commits in **committer-date order** and stops as soon as it sees
+the previous release commit SHA. When a long-lived branch is merged into the
+release branch mid-cycle, its commits carry their original (older) committer
+dates and end up "behind" the previous release SHA in the date-ordered walk —
+release-please skips them. This produced concrete data loss
+(e.g. PR #7397 missing from a release) and is the trigger for this migration.
+
+Changesets, driven by a converter that uses `git log <tag>..HEAD`, is
+**reachability-based**: a commit is included if it is reachable from `HEAD`
+but not from the baseline tag, regardless of its committer date. The merge-late
+scenario stops being a hazard.
+
+The migration also has to preserve three things the team relies on today:
+
+1. All existing `CHANGELOG.md` files keep their full history.
+2. All app/lib versions in `package.json` stay where release-please left them.
+3. The existing npm publishing GitHub Action (Nx-based) keeps working.
+
+## Constraints decided up front
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Bump source | Derived from conventional commits via a custom converter | Preserves existing contributor workflow (commitlint already enforces conventional commits). |
+| Tracking scope | 28 packages tracked (4 apps + 24 libs); 8 libs published | Mirrors the set of packages with existing `CHANGELOG.md` files. Apps + non-publishable libs keep their `CHANGELOG.md` and `package.json` version bumps. |
+| Changelog format for new entries | `@changesets/changelog-github` (flat list + PR/author links) | Standard, low-maintenance. Old entries (emoji sections) stay intact above new entries. |
+| Publish command | `pnpm exec nx release publish` (unchanged) | Minimal CI risk. `prepare-publish.mjs` continues to resolve `workspace:*` deps. |
+| Release trigger | `push: main` (unchanged from today) | Same flow contributors already understand. |
+
+## Architecture
+
+```
+                      push to main
+                           │
+                           ▼
+            ┌──────────────────────────────┐
+            │ .github/workflows/release.yml│
+            │                              │
+            │  1. commits-to-changesets    │  (custom script)
+            │     parses conv. commits     │
+            │     → writes .changeset/*.md │
+            │                              │
+            │  2. changesets/action@v1     │  (official action)
+            │     - if .changeset/*.md     │
+            │       present → open/update  │
+            │       "Version Packages" PR  │
+            │     - if PR was just merged  │
+            │       → published = true     │
+            └──────────────┬───────────────┘
+                           │
+                           ▼
+          ┌────────────────────────────────────┐
+          │ Version Packages PR (auto-opened)  │
+          │  - bumps package.json versions     │
+          │  - appends CHANGELOG.md entries    │
+          │  - removes consumed .changeset/*   │
+          └────────────────┬───────────────────┘
+                           │ merge
+                           ▼
+            ┌──────────────────────────────┐
+            │  publish job (existing one)  │
+            │  - nx build (8 publish libs) │
+            │  - prepare-publish.mjs       │
+            │  - nx release publish        │
+            │  - tag release-<ISO>         │
+            └──────────────────────────────┘
+```
+
+Two new units of code: one converter script and one workflow file. Everything
+else either stays or is deleted.
+
+## Component: commit-to-changeset converter
+
+**Path**: `tools/scripts/commits-to-changesets.mjs`
+
+**Responsibility**: walk commits since the last release tag, emit one
+`.changeset/auto-<short-sha>-<pkg>.md` per `(commit, affected-package)` pair.
+
+### Baseline discovery
+
+```
+BASELINE_REF env var (workflow_dispatch override)
+  └── if unset: git describe --match 'release-*' --abbrev=0
+       └── if no tag exists: log warning + exit 0 (no changesets emitted)
+```
+
+Baseline is **always** a git ref (tag or SHA). Dates are never used. The
+"no baseline at all" case happens exactly once — on the push event fired by
+the migration PR's own merge, before any `release-*` tag exists. In that case
+the converter exits 0 with a clear message ("No baseline tag found; pass
+`baseline_ref` via workflow_dispatch to bootstrap"), `changesets/action` sees
+no `.changeset/*.md` files and does nothing. The operator then runs
+`workflow_dispatch` with `baseline_ref` set to the migration merge SHA.
+
+### Walk command
+
+```
+git log --no-merges --reverse "$BASELINE..HEAD"
+```
+
+- `--no-merges`: merge commits ("Merge branch 'develop'") aren't conventional, so we skip them. The content commits they bring in are still included because each is reachable from `HEAD`.
+- `--reverse`: oldest first, for deterministic, idempotent changeset filenames.
+- **Not** `--first-parent`: that would skip commits on merged branches that are exactly the case we're trying to capture.
+
+### Bump derivation
+
+| Commit type / marker | Bump |
+|---|---|
+| `BREAKING CHANGE:` footer, or `<type>!:` in subject | `major` |
+| `feat` | `minor` |
+| `fix`, `perf`, `refactor`, `docs`, `test`, `chore`, anything else | `patch` |
+
+Unparseable commits → `patch` + warning log. Releases must not be unblockable.
+
+### Affected-package detection
+
+For each commit:
+
+1. `git diff --name-only <commit>^ <commit>` → list of touched files.
+2. For each file, find the longest matching package path from
+   `tools/release/tracked-packages.json`.
+3. Collect the unique set of affected packages.
+4. Files outside any tracked package (root configs, `tools/`, `docs/`,
+   `apps/cowswap-frontend-e2e`, `apps/sdk-tools`, `apps/storybook`) are
+   ignored. If a commit touches **only** untracked paths, no changeset is
+   emitted.
+
+### Output format
+
+```markdown
+---
+"@cowprotocol/events": minor
+---
+
+feat: bring cow.fi back (sdk) (#7359)
+```
+
+- Filename: `.changeset/auto-<short-sha>-<pkg-slug>.md` (deterministic for idempotency).
+- Summary line: the commit subject as-is. `@changesets/changelog-github` hydrates it with PR + author links during `changeset version`.
+- One file per `(commit, package)` pair. Multi-package commits produce multiple files.
+
+### Idempotency
+
+Before writing each file, check if it exists; skip if it does. Safe to re-run
+(e.g., `workflow_dispatch` retries).
+
+### Explicitly out of scope
+
+- Transitive workspace-dep bumps (handled by `changesets` `updateInternalDependencies: "patch"`).
+- Manual hand-written `.changeset/*.md` from contributors (the converter doesn't touch files it didn't create; manual and auto coexist).
+
+## Component: tracked-packages registry
+
+**Path**: `tools/release/tracked-packages.json`
+
+Single source of truth for the 28 tracked package paths. Consumed by the
+converter and a unit test that asserts the file matches the set of `package.json`
+files in `apps/*` and `libs/*` that are *not* in the untracked allowlist
+(`cowswap-frontend-e2e`, `sdk-tools`, `storybook`).
+
+Format:
+
+```json
+{
+  "packages": [
+    "apps/cow-fi",
+    "apps/cowswap-frontend",
+    "apps/explorer",
+    "apps/widget-configurator",
+    "libs/abis",
+    "libs/analytics",
+    "libs/assets",
+    "libs/balances-and-allowances",
+    "libs/common-const",
+    "libs/common-hooks",
+    "libs/common-utils",
+    "libs/core",
+    "libs/currency",
+    "libs/ens",
+    "libs/events",
+    "libs/hook-dapp-lib",
+    "libs/iframe-transport",
+    "libs/multicall",
+    "libs/permit-utils",
+    "libs/snackbars",
+    "libs/tokens",
+    "libs/types",
+    "libs/ui",
+    "libs/ui-utils",
+    "libs/wallet",
+    "libs/wallet-provider",
+    "libs/widget-lib",
+    "libs/widget-react"
+  ]
+}
+```
+
+## Component: changesets config
+
+**Path**: `.changeset/config.json`
+
+```json
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "cowprotocol/cowswap" }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
+```
+
+- `commit: false` → action opens a PR rather than direct-committing.
+- `baseBranch: "main"` → same release branch as today.
+- `updateInternalDependencies: "patch"` → mirrors release-please's `node-workspace` cascade.
+- `ignore: []` → empty by design. Non-publishable packages are excluded via
+  `"private": true` on each package, not here — `ignore` would prevent
+  versioning entirely, but we still want CHANGELOG.md updates for apps and
+  non-publishable libs.
+
+## Component: package privacy flags
+
+Target state:
+
+| Set | Count | `"private": true`? |
+|---|---|---|
+| Publishable libs (`events`, `currency`, `types`, `permit-utils`, `widget-lib`, `widget-react`, `iframe-transport`, `hook-dapp-lib`) | 8 | **no** |
+| Non-publishable libs (`abis`, `analytics`, `assets`, `balances-and-allowances`, `common-const`, `common-hooks`, `common-utils`, `core`, `ens`, `multicall`, `snackbars`, `tokens`, `ui`, `ui-utils`, `wallet`, `wallet-provider`) | 16 | **yes** |
+| Apps (`cowswap-frontend`, `explorer`, `cow-fi`, `widget-configurator`) | 4 | **yes** |
+| **Total tracked** | **28** | — |
+
+Implementation step in the migration PR: audit all 28 tracked `package.json`
+files, set `"private": true` on the 20 non-publishable ones if not already.
+The 8 publishable libs must NOT have `"private": true`; `prepare-publish.mjs`
+keeps its existing safety net (warn + strip) as defense-in-depth.
+
+Some packages may already have `"private": true` (e.g., `libs/ui`); the audit
+step is a no-op for those. The principle: publishable ⇔ `private` absent;
+everything else ⇔ `"private": true`.
+
+## Component: GitHub workflow
+
+**Path**: `.github/workflows/release.yml` (replaces `release-please.yml`)
+
+### Trigger
+
+```yaml
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: "Override baseline (commit SHA or tag). Leave empty to use latest release-* tag."
+        required: false
+```
+
+### Job 1: `release`
+
+Outputs: `published` (gate for job 2).
+
+Permissions: `contents: write`, `pull-requests: write`.
+
+Steps:
+
+1. `actions/checkout@v4` with `fetch-depth: 0`, `fetch-tags: true`, and the
+   reused `RELEASE_PLEASE_AUTH` token. **Fetch depth and tags are essential**
+   — without them `git log $TAG..HEAD` silently returns nothing.
+2. `pnpm/action-setup` + `actions/setup-node` (same pins as today).
+3. `pnpm install --frozen-lockfile`.
+4. `node tools/scripts/commits-to-changesets.mjs` (with `BASELINE_REF` env
+   from the workflow input).
+5. `changesets/action@v1` with:
+   - `version: pnpm changeset version`
+   - `publish: echo "publish handled in next job"` (no-op; the `published`
+     output is what we want).
+   - `commit: "chore(main): release"`, `title: "chore(main): release"`.
+   - `createGithubReleases: false`.
+
+How the action's behavior maps to the two states we care about:
+
+- **`.changeset/*.md` files present on main** → action opens/updates
+  `changeset-release/main` Version PR; sets `published=false`. Job 2 skipped.
+- **No `.changeset/*.md` files but package versions ahead of npm** → action
+  detects publishable bumps, runs the (no-op) publish command, sets
+  `published=true` + `publishedPackages`. Job 2 runs.
+
+The action ignores private packages when computing `published`, so the gate
+fires only when at least one of the 8 publishable libs has a bump.
+
+### Job 2: `publish`
+
+Identical to the current publish job, gated on `needs.release.outputs.published == 'true'`. New final step:
+
+```yaml
+- name: Tag release baseline
+  run: |
+    TAG="release-$(date -u +%Y%m%dT%H%M%SZ)"
+    git tag -a "$TAG" -m "Release published at $TAG"
+    git push origin "$TAG"
+```
+
+This tag becomes the converter's baseline for the next run, eliminating the
+need for `workflow_dispatch` after the first run.
+
+## Migration sequence
+
+Lands as **one PR** so the repo never sits in a half-migrated state.
+Internally ordered for review readability:
+
+1. **Add new infra (no behavior change)**
+   - `tools/release/tracked-packages.json`
+   - `tools/scripts/commits-to-changesets.mjs`
+   - `tools/scripts/commits-to-changesets.test.mjs` with fixtures:
+     - feat commit → minor
+     - fix commit → patch
+     - `feat!:` → major
+     - `BREAKING CHANGE:` footer → major
+     - non-conventional commit → patch + warning
+     - commit touching two packages → two changesets
+     - commit touching only `tools/` → no changeset
+     - re-run produces no new files (idempotency)
+   - `.changeset/config.json` + `.changeset/README.md`
+   - `package.json`: devDeps `@changesets/cli`, `@changesets/changelog-github`;
+     scripts `"changeset"`, `"changeset:version"`.
+2. **Flip privacy flags** on 20 non-publishable packages (one-line diffs).
+3. **Swap the workflow**
+   - Add `.github/workflows/release.yml`.
+   - Delete `.github/workflows/release-please.yml`,
+     `release-please-config.json`, `.release-please-manifest.json`.
+
+The secret rename `RELEASE_PLEASE_AUTH` → `RELEASE_BOT_TOKEN` is a follow-up
+to avoid coordinating an Actions secret rename with the merge.
+
+## First run
+
+No `release-*` tag exists at merge time, so the converter has no baseline.
+
+Two events happen in order:
+
+1. **Automatic push event** (fires when the migration PR is merged): converter
+   finds no baseline → logs warning → exits 0. `changesets/action` runs with
+   no `.changeset/*.md` files present and no version discrepancy vs npm → exits
+   cleanly. Workflow ends green, having done nothing. This is the desired
+   bootstrap state.
+2. **Manual `workflow_dispatch`**: operator triggers it with `baseline_ref`
+   set to the migration PR's merge SHA. Converter walks
+   `git log $MERGE_SHA..HEAD` → zero commits (nothing has merged since) →
+   zero changesets emitted. Same outcome as step 1, but now we've smoke-tested
+   the converter end-to-end.
+
+The next real PR merged to `main` is the first commit past the baseline.
+That push run still finds no `release-*` tag — so the operator needs to use
+`workflow_dispatch` with `baseline_ref` once more (pointing at the migration
+merge SHA) for the first real release. After that first publish, the publish
+job creates `release-<ISO>`, and from then on `git describe` works
+automatically — no more manual triggers needed.
+
+## Version + CHANGELOG preservation
+
+- `package.json` `version` fields are untouched by the migration. They stay
+  at the values release-please last set (matching `.release-please-manifest.json`,
+  which we then delete; `package.json` becomes sole source of truth as
+  changesets expects).
+- All 28 existing `CHANGELOG.md` files are untouched. `changeset version`
+  appends to existing files; it doesn't rewrite them.
+- Existing release-please tags (e.g., `events-v4.3.1`) are not deleted. They
+  remain valid history. New tags use the `release-<ISO>` pattern; we don't
+  retrofit per-package tags.
+
+## Verification
+
+**Before merge**:
+
+1. Run `node tools/scripts/commits-to-changesets.mjs` locally against a known
+   commit range. Verify expected `.changeset/*.md` outputs.
+2. Run `pnpm changeset version` locally on those generated files. Verify
+   versions bump and `CHANGELOG.md` files get appended correctly. **Discard**
+   the result (do not commit).
+3. Lint the new workflow file with `actionlint` if available.
+4. Unit tests for the converter pass (see fixtures list above).
+
+**After merge, before the first real release**:
+
+1. Trigger `workflow_dispatch` with `baseline_ref` = migration merge SHA.
+   Expect: zero changesets emitted, no Version PR opened, workflow succeeds.
+2. Wait for the next normal PR to merge to `main`. The automatic push run
+   will be a no-op (no baseline tag yet) — this is expected.
+3. Trigger `workflow_dispatch` again with `baseline_ref` = migration merge SHA.
+   Expect: one changeset per touched package, Version PR opens with expected
+   bump.
+4. Merge the Version PR. Expect: publish job runs, `nx release publish`
+   succeeds, `release-<ISO>` tag is pushed.
+5. From this point on, push-triggered runs work automatically. Verify by
+   merging a second PR and watching the next push run open a new Version PR
+   without manual intervention.
+
+## Rollback
+
+- Before the first changesets release publishes anything: revert the
+  migration PR. Everything new is removed, release-please files come back,
+  npm is untouched.
+- After the first changesets release publishes: revert restores
+  release-please's workflow files but leaves `package.json` versions ahead
+  of `.release-please-manifest.json`. Recovery: a one-time hand-edit of the
+  restored `.release-please-manifest.json` to match the new `package.json`
+  versions (~26 lines). npm versions cannot be unpublished, so this asymmetry
+  is unavoidable.
+
+## Deliverables summary
+
+| Action | Files |
+|---|---|
+| **New** | `tools/scripts/commits-to-changesets.mjs`, `tools/scripts/commits-to-changesets.test.mjs`, `tools/release/tracked-packages.json`, `.changeset/config.json`, `.changeset/README.md`, `.github/workflows/release.yml` |
+| **Modified** | Root `package.json` (devDeps + scripts), 20 package `package.json` files (add `"private": true`) |
+| **Deleted** | `.github/workflows/release-please.yml`, `release-please-config.json`, `.release-please-manifest.json` |
+| **Unchanged** | All `CHANGELOG.md` files, `nx.json`, `tools/scripts/prepare-publish.mjs`, `commitlint.config.js`, structure of the publish job |
