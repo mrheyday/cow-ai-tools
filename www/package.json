@@ -16,7 +16,7 @@
     "start:mock": "ts-node src/mocks/index.ts"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^10.5.0",
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
